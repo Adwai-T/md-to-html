@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>MD TO HTML</title>
+</head>
+<body>
+
+  <style>
+    #container{
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      height: 90vh;
+      align-items: center;
+    }
+    #controls{
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    button{
+      padding: 5px;
+      width: 10vw;
+    }
+    .display-area{
+      height: 100%;
+      width: 42vw;
+      margin: 5px 5px;
+    }
+  </style>
+
+  <div id="container">
+    <textarea id="text-input" class="display-area"></textarea>
+    <div id="controls">
+      <button id="from-text">From Text</button>
+      <button id="from-link">From Link</button>
+      <button id="show-html">Show Html</button>
+      <button id="show-page">Show page</button>
+    </div>
+    <iframe id="result-page" class="display-area"></iframe>
+    <textarea id="result-html" .class="display-area" type="text"></textarea>
+  </div>
+  <script src="index.js" type="module"></script>
+</body>
+</html>

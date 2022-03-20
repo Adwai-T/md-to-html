@@ -1,0 +1,35 @@
+{
+  "whiteSpace" : {
+    "endl" : {
+      "regex" : "\n",
+      "flags" : ""
+    }
+  },
+  "heading" : {
+    "#" : {
+      "regex" : "^#\\s",
+      "flags" : "gm"
+    },
+    "##" : {
+      "regex" : "^##\\s",
+      "flags" : "gm"
+    },
+    "###" : {
+      "regex" : "^###\\s",
+      "flags" : "gm"
+    },
+    "####" : {
+      "regex" : "^####\\s",
+      "flags" : "gm"
+    }
+  },
+  "code" : {
+
+  },
+  "quote" : {
+
+  },
+  "list" : {
+
+  }
+}
