@@ -1,7 +1,4 @@
-import { Stack } from "./Stack.js";
-
-const url = 'https://raw.githubusercontent.com/Adwai-T/Notes/master/Utilities/Maven.md';
-const regexJson = "./regex.json"
+const regexJson = "/src/regex.json"
 // const stack = new Stack();
 
 let fetchString = '';
