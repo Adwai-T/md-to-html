@@ -23,13 +23,34 @@
       "flags" : "gm"
     }
   },
-  "code" : {
-
+  "inlineCode" : {
+    "regex" : "`(?<codeString>.*?)`",
+    "flags" : ""
   },
   "quote" : {
 
   },
   "list" : {
 
+  },
+  "link" : {
+    "regex" : "[^!]\\[(?<linkName>.*?)\\]\\((?<linkSrc>.*?)\\)",
+    "flags" : ""
+  },
+  "picture" : {
+    "regex" : "!\\[(?<imageAltText>.*?)\\]\\((?<imageSrc>.*?)\\)",
+    "flags" : ""
+  },
+  "bold-em" : {
+    "regex" : "\\*{3}(?<boldEmContent>.*?)\\*{3}",
+    "flags" : ""
+  },
+  "bold" : {
+    "regex" : "\\*{2}(?<boldContent>.*?)\\*{2}",
+    "flags" : ""
+  },
+  "em" : {
+    "regex" : "\\*{1}(?<emContent>.*?)\\*{1}",
+    "flags" : ""
   }
 }

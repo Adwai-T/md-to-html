@@ -1,4 +1,4 @@
-const regexJson = "/src/regex.json"
+const regexFileLink = "/src/regex.json"
 // const stack = new Stack();
 
 let fetchString = '';
@@ -37,22 +37,26 @@ async function load(url, text) {
     stringMD = text;
   }
 
-  fetchRegex = fetch(regexJson);
+  fetchRegex = fetch(regexFileLink);
 
   regexJSON = await (await fetchRegex).json();
   regexReady = true;
 
+  //--- Work on elements like headings, lists, code
+  //that occur at the start of line
   while(stringMD.length > 1) {
-    process();
+    processStartOfLineElements();
   }
-  console.log(stringHTML);
-  return new Promise((resolve, reject) => {
-    resolve(stringHTML);
-    reject("SomeThing Went Wrong In Load.");
-  });
+  //--- Work on inline elements like links, pictures, bold etc.
+  stringHTML = processAllInLineElements(stringHTML);
+  stringHTML = processAllImageElements(stringHTML);
+  stringHTML = isBoldItalicOrBothInline(stringHTML);
+  stringHTML = isInlineCode(stringHTML);
+
+  return stringHTML;
 }
 
-function process() {
+function processStartOfLineElements() {
   let line = removeAndGetline();
   let lineType = lineStartWith[line[0]];
   // console.log(lineType, line);
@@ -68,6 +72,8 @@ function process() {
       break;
     case 'code':
       if(isCodeBlock(line)) break;
+      isParagraph(line);
+      break;
     case 'quote' : 
       stringHTML = stringHTML.concat(isQuote(line));
       break;
@@ -79,11 +85,39 @@ function process() {
         isOrderedList(line);
         break;
       }
-      line = `<p>${line}</p>`;
-      stringHTML = stringHTML.concat(line);
+      isParagraph(line);
       break;
   }
   return true;
+}
+
+function isParagraph(line) {
+  line = `<p>${line}</p>`;
+  stringHTML = stringHTML.concat(line);
+}
+
+function processAllInLineElements(string) {
+  let match = matchRegex(string, regexJSON['link']);
+  while(match) {
+    //Regex of link will check so that there is no ! at start, so that it is not image
+    //So we want prevent the first charcter of match from being sliced, hence `+1`
+    string = string.slice(0, match.index+1) 
+    + `<a href="${match.groups.linkSrc}">${match.groups.linkName}</a>` 
+    + string.slice(match.index+match[0].length);
+    match = matchRegex(string, regexJSON['link']);
+  }
+  return string;
+}
+
+function processAllImageElements(string) {
+  let match = matchRegex(string, regexJSON['picture']);
+  while(match) {
+    string = string.slice(0, match.index) 
+    + `<img src="${match.groups.imageSrc}" alt="${match.groups.imageAltText}"/>` 
+    + string.slice(match.index+match[0].length);
+    match = matchRegex(string, regexJSON['picture']);
+  }
+  return string;
 }
 
 function isHeading(line) {
@@ -118,7 +152,54 @@ function isOrderedList(line) {
   return;
 }
 
+//Is decorated(bold, em, both) inline
+function isBoldItalicOrBothInline(string) {
+  //first find all bold and italic both
+  let match = matchRegex(string, regexJSON['bold-em']);
+  while(match) {
+    string = string.slice(0, match.index) 
+    + `<strong><em>${match.groups.boldEmContent} </em></strong>` 
+    + string.slice(match.index+match[0].length);
+    match = matchRegex(string, regexJSON['bold-em']);
+  }
+
+  //second find all bold
+  match = matchRegex(string, regexJSON['bold']);
+  while(match) {
+    string = string.slice(0, match.index) 
+    + `<strong>${match.groups.boldContent}</strong>` 
+    + string.slice(match.index+match[0].length);
+    match = matchRegex(string, regexJSON['bold']);
+  }
+
+  //last for em
+  match = matchRegex(string, regexJSON['em']);
+  while(match) {
+    string = string.slice(0, match.index) 
+    + `<em>${match.groups.emContent}</em>` 
+    + string.slice(match.index+match[0].length);
+    match = matchRegex(string, regexJSON['em']);
+  }
+  return string;
+}
+
+function isInlineCode(string) {
+  let match = matchRegex(string, regexJSON['inlineCode']);
+  while(match) {
+    string = string.slice(0, match.index) 
+    + `<samp>${match.groups.codeString}</samp>` 
+    + string.slice(match.index+match[0].length);
+    match = matchRegex(string, regexJSON['inlineCode']);
+  }
+  return string;
+}
+
 function isUnOrderedList(line) {
+  if(line[1] !== ' ') {
+    // isBoldItalicOrBoth(line);
+    isParagraph(line);
+    return;
+  }
   line = line.slice(1);
   line = `<ul>\n\t<li>${line}</li>\n`;
   stringHTML = stringHTML.concat(line);
@@ -200,16 +281,21 @@ function removeLine() {
 }
 
 function matchAllRegex(string, regexJson) {
-  let regexp = RegExp(regexJson.regex, regexJson.flags);
+  let regexp = new RegExp(regexJson.regex, regexJson.flags);
   return string.matchAll(regexp);
 }
 
 function matchRegex(string, regexJson) {
-  let regexp = RegExp(regexJson.regex, regexJson.flags);
+  let regexp =new RegExp(regexJson.regex, regexJson.flags);
   return string.match(regexp);
 }
 
+function clearOutPut() {
+  stringHTML = '';
+}
+
 fromTextButton.onclick= ()=> {
+  clearOutPut();
   let text = textInput.value;
   load(undefined, text).then(result => {
     resultText.value = result
@@ -218,6 +304,7 @@ fromTextButton.onclick= ()=> {
 }
 
 fromLinkButton.onclick= ()=> {
+  clearOutPut();
   let link = textInput.value;
   load(link).then(result => {
     resultText.value = result
