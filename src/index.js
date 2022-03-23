@@ -279,9 +279,14 @@ function isBoldItalicOrBothInline(string) {
 function isInlineCode(string) {
   let match = matchRegex(string, regexJSON['inlineCode']);
   while(match) {
+    let codeString = match.groups.codeString;
+    Object.keys(htmlEsacpeCharacters)
+    .forEach(key => codeString = codeString.replace(key, htmlEsacpeCharacters[key]));
+
     string = string.slice(0, match.index) 
-    + `<samp>${match.groups.codeString}</samp>` 
+    + `<samp>${codeString}</samp>` 
     + string.slice(match.index+match[0].length);
+    
     match = matchRegex(string, regexJSON['inlineCode']);
   }
   return string;
