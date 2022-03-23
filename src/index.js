@@ -1,8 +1,8 @@
 const regexFileLink = "/src/regex.json"
 // const stack = new Stack();
 
-let fetchString = '';
-let fetchRegex = '';
+let fetchURL;
+let fetchRegex;
 
 const fromTextButton = document.getElementById('from-text');
 const fromLinkButton = document.getElementById('from-link');
@@ -14,9 +14,7 @@ const resultText = document.getElementById('result-html');
 
 let stringMD = '';
 let stringHTML = '';
-let stringValueAvailable = false;
 let regexJSON = {};
-let regexReady = false;
 let done = false;
 const lineStartWith = {
   '#' : "heading",
@@ -31,17 +29,23 @@ const lineStartWith = {
 
 async function load(url, text) {
   if(url) {
-    fetchString = fetch(url)
-    stringMD = await (await fetchString).text();
-    stringValueAvailable = true;
+    try{
+      fetchURL = fetch(url)
+      let fetchReponse = await fetchURL;
+      if(!fetchReponse.ok) 
+        throw new Error('<h2 style="color:red;">There was Error fetching from link, Please check the link and try again.</h2>')
+      stringMD = await fetchReponse.text();
+    }
+    catch(error) {
+      console.log(error);
+      return '<h2 style="color:red;">There was Error fetching from link, Please check the link and try again.</h2>';
+    }
   }else {
     stringMD = text;
   }
 
   fetchRegex = fetch(regexFileLink);
-
   regexJSON = await (await fetchRegex).json();
-  regexReady = true;
 
   //--- Work on elements like headings, lists, code
   //that occur at the start of line
@@ -127,6 +131,7 @@ function isTableRow(line) {
 function isTable(string) {
   //remove table division
   let matchTableDivison = matchRegex(string, regexJSON['tableDivision']);
+  if(!matchTableDivison) return string;
   while(matchTableDivison) {
     string = string.slice(0, matchTableDivison.index) 
     + string.slice(matchTableDivison[0].length + matchTableDivison.index);
@@ -135,6 +140,7 @@ function isTable(string) {
   }
 
   let allTableRows = [...matchAllRegex(string, regexJSON['tableRow'])];
+  if(!allTableRows) return string;
   let tables = [];
   let tableStartAndEndIndex = [];
   let table = '';
@@ -176,17 +182,10 @@ function isTable(string) {
     //<table>\n</table> add total of 16 chars for each table.
     let start = tableStartAndEndIndex[i*2] + 16*i;
     let end = tableStartAndEndIndex[i*2 + 1] + 16*i;
-    console.log(i, start, end);
-
     let beforeTable = string.slice(0, start);
     let afterTable = string.slice(end);
     string = beforeTable + tables[i] + afterTable;
-
-    console.log('before' , beforeTable);
-    console.log('after' , afterTable);
   }
-  console.log(tables);
-  console.log(tableStartAndEndIndex);
   return string;
 }
 
@@ -390,9 +389,9 @@ function clearOutPut() {
 
 fromTextButton.onclick= ()=> {
   clearOutPut();
-  let text = textInput.value;
+  let text = textInput.value + '\n';
   load(undefined, text).then(result => {
-    resultText.value = result
+    resultText.value = result;
     iframeResultPage.contentWindow.document.body.innerHTML = result;
   });
 }
