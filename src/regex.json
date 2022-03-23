@@ -33,6 +33,18 @@
   "list" : {
 
   },
+  "tableRow" :{
+    "regex" : "<tr>[\\s\\S]*?<\/tr>\n",
+    "flags" : "gm"
+  },
+  "tableDivision" : {
+    "regex" : "<tr>\n\t<td>:*-+[\\s\\S]+?<\/tr>",
+    "flags" : "m"
+  },
+  "tableElement" : {
+    "regex" : "\\|",
+    "flags" : "g"
+  },
   "link" : {
     "regex" : "[^!]\\[(?<linkName>.*?)\\]\\((?<linkSrc>.*?)\\)",
     "flags" : ""

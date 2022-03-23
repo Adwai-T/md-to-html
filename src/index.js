@@ -26,6 +26,7 @@ const lineStartWith = {
   '*' : "list",
   '\n' : "newLine",
   '\r\n' : "newLine",
+  '|' : "tableRow"
 }
 
 async function load(url, text) {
@@ -48,12 +49,17 @@ async function load(url, text) {
     processStartOfLineElements();
   }
   //--- Work on inline elements like links, pictures, bold etc.
+  processInlineElements();
+
+  return stringHTML;
+}
+
+function processInlineElements () {
   stringHTML = processAllInLineElements(stringHTML);
   stringHTML = processAllImageElements(stringHTML);
   stringHTML = isBoldItalicOrBothInline(stringHTML);
   stringHTML = isInlineCode(stringHTML);
-
-  return stringHTML;
+  stringHTML = isTable(stringHTML);
 }
 
 function processStartOfLineElements() {
@@ -80,6 +86,10 @@ function processStartOfLineElements() {
     case 'list' : 
       isUnOrderedList(line);
       break;
+    case 'tableRow' : 
+      // if(line[1] === ':' || line[1] === '' || line[1] === '-')
+      stringHTML = stringHTML.concat(isTableRow(line));
+      break;
     default :
       if(!isNaN(parseInt(line[0])) && line[1] === '.') {
         isOrderedList(line);
@@ -92,8 +102,92 @@ function processStartOfLineElements() {
 }
 
 function isParagraph(line) {
-  line = `<p>${line}</p>`;
+  line = `<p>${line}</p>\n`;
   stringHTML = stringHTML.concat(line);
+}
+
+function isTableRow(line) {
+  let rowElements = [];
+  let prevousMatch;
+  let matches = matchAllRegex(line, regexJSON['tableElement']);
+  for(let match of matches) {
+    if(!prevousMatch) {
+      prevousMatch = match;
+      continue;
+    }
+    rowElements.push(line.slice(prevousMatch.index+1, match.index-1).trim());
+    prevousMatch = match;
+  }
+  let returnline = '<tr>'
+  rowElements.forEach(elem => returnline = returnline.concat(`\n\t<td>${elem}</td>`));
+  returnline = returnline.concat('\n</tr>\n');
+  return returnline;
+}
+
+function isTable(string) {
+  //remove table division
+  let matchTableDivison = matchRegex(string, regexJSON['tableDivision']);
+  while(matchTableDivison) {
+    string = string.slice(0, matchTableDivison.index) 
+    + string.slice(matchTableDivison[0].length + matchTableDivison.index);
+
+    matchTableDivison = matchRegex(string, regexJSON['tableDivision']);
+  }
+
+  let allTableRows = [...matchAllRegex(string, regexJSON['tableRow'])];
+  let tables = [];
+  let tableStartAndEndIndex = [];
+  let table = '';
+  let tableHeadAdded = false;
+  allTableRows.forEach((match) => {
+    let start = match.index;
+    let end = match.index + match[0].length;
+    //is Heading < \n <
+    if(
+      string[start]==='<' &&
+      (string[end] === '\n' || string[end] === undefined) && //if the table is the last element of the file
+      (string[end+1] === '<' || string[end+1] === undefined) //the values will be undefined
+      ) {
+      if(tableHeadAdded) {
+        table = table.concat(string.slice(start, end));
+        table = table.concat('</table>');
+        tables.push(table);
+        table = '';
+        tableHeadAdded = false;
+        tableStartAndEndIndex.push(end);
+      }
+      else {
+        table = string.slice(start, end+1);
+        table = `<table>\n${table}`;
+        table = table.replace(new RegExp('<td>', 'gm'), '<th>');
+        table = table.replace(new RegExp('</td>', 'gm'), '</th>');
+        tableHeadAdded = true;
+        tableStartAndEndIndex.push(start);
+      }
+    }
+    //< < t is body of table
+    else if(string[start] === '<' && string[end] === '<' && string[end+1] === 't') {
+      table = table.concat(string.slice(start, end));
+    }
+  });
+
+  // string = string.slice(tableStartAndEndIndex[1]);
+  for(let i = 0; i < tables.length; i++) {
+    //<table>\n</table> add total of 16 chars for each table.
+    let start = tableStartAndEndIndex[i*2] + 16*i;
+    let end = tableStartAndEndIndex[i*2 + 1] + 16*i;
+    console.log(i, start, end);
+
+    let beforeTable = string.slice(0, start);
+    let afterTable = string.slice(end);
+    string = beforeTable + tables[i] + afterTable;
+
+    console.log('before' , beforeTable);
+    console.log('after' , afterTable);
+  }
+  console.log(tables);
+  console.log(tableStartAndEndIndex);
+  return string;
 }
 
 function processAllInLineElements(string) {
