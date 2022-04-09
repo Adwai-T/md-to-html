@@ -1,0 +1,70 @@
+h2 {
+  text-align: center;
+}
+#container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  height: 80vh;
+  align-items: center;
+}
+#controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.display-area {
+  height: 100%;
+  width: 42vw;
+  margin: 5px 5px;
+  background-color: var(--color1);
+  color: var(--white);
+  border-color: black;
+  resize: none;
+}
+/* CSS */
+.button {
+  width: 10vw;
+  border-radius: 8px;
+  border-style: none;
+  box-sizing: border-box;
+  color: #ffffff;
+  cursor: pointer;
+  display: inline-block;
+  font-family: "Haas Grot Text R Web", "Helvetica Neue", Helvetica, Arial,
+    sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  height: 40px;
+  line-height: 20px;
+  list-style: none;
+  margin: 0;
+  outline: none;
+  padding: 10px 16px;
+  position: relative;
+  text-align: center;
+  text-decoration: none;
+  transition: color 100ms;
+  vertical-align: baseline;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  margin: 10px 0px;
+}
+
+.button-red {
+  background-color: #ea4c89;
+}
+.button-red:hover,
+.button-red:focus {
+  background-color: #f082ac;
+}
+
+.button-blue {
+  background-color: #1e90ff;
+}
+.button-blue:hover,
+.button-blue:focus {
+  background-color: #00bfff;
+}
