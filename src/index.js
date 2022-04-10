@@ -26,6 +26,18 @@ const lineStartWith = {
   '\r\n' : "newLine",
   '|' : "tableRow"
 }
+//Used for generating unique id
+let headingIndexCounts = {
+  h1 : 0,
+  h2 : 0,
+  h3 : 0,
+  h4 : 0,
+  h5 : 0,
+  h6 : 0,
+}
+
+//Containes {id, title}
+let indexHeadings = [];
 
 async function load(url, text) {
   if(url) {
@@ -37,7 +49,6 @@ async function load(url, text) {
       stringMD = await fetchReponse.text();
     }
     catch(error) {
-      console.log(error);
       return '<h2 style="color:red;">There was Error fetching from link, Please check the link and try again.</h2>';
     }
   }else {
@@ -55,7 +66,24 @@ async function load(url, text) {
   //--- Work on inline elements like links, pictures, bold etc.
   processInlineElements();
 
+  //--- Add index
+  stringHTML = createIndex().concat(stringHTML);
+
+  //--- Add style file
+  stringHTML = '<link rel="stylesheet" href="display-page.css" />\n<!--Style Applied-->\n'.concat(stringHTML);
+
   return stringHTML;
+}
+
+function createIndex() {
+  if(indexHeadings.length < 1) return '';
+  let index = `<h2 id="index-title">${indexHeadings[0].title} Index</h2>\n<ul id="index-list">\n`;
+  for(let i = 1; i < indexHeadings.length; i++) {
+    let headingType = parseInt(indexHeadings[i].id.charAt(1));
+    index = index.concat(`<li class="index-li-h${headingType}"><a href="#${indexHeadings[i].id}">${indexHeadings[i].title}</a></li>\n`)
+  }
+  index = index.concat('</ul>\n\n')
+  return index;
 }
 
 function processInlineElements () {
@@ -119,7 +147,7 @@ function isTableRow(line) {
       prevousMatch = match;
       continue;
     }
-    rowElements.push(line.slice(prevousMatch.index+1, match.index-1).trim());
+    rowElements.push(line.slice(prevousMatch.index+1, match.index).trim());
     prevousMatch = match;
   }
   let returnline = '<tr>'
@@ -219,7 +247,16 @@ function isHeading(line) {
     count++;
   }
   line = line.slice(count+1);//count+1 as `## ` heading have space after
-  line = `<h${count}>`.concat(line, `</h${count}>`);
+  let indexHeading = {
+    id : '',
+    title : ''
+  }
+
+  indexHeading.id = `h${count}-${headingIndexCounts[`h${count}`]++}`; 
+  indexHeading.title = line;
+  indexHeadings.push(indexHeading);
+
+  line = `<h${count} id="${indexHeading.id}">`.concat(line, `</h${count}>`);
   return line;
 }
 
@@ -280,6 +317,8 @@ function isInlineCode(string) {
   let match = matchRegex(string, regexJSON['inlineCode']);
   while(match) {
     let codeString = match.groups.codeString;
+    codeString = codeString.replaceAll('<', "&lt;")
+    codeString = codeString.replaceAll('>', "&gt;")
     Object.keys(htmlEsacpeCharacters)
     .forEach(key => codeString = codeString.replace(key, htmlEsacpeCharacters[key]));
 
@@ -335,18 +374,18 @@ function isCodeBlock(line) {
   if(count > 2) {
     line = line.slice(count);
     let codeType = line; //What remains after ``` is code type as ```js
-    line = `<code><${line}><pre>\n`
+    line = `\n<code><${codeType}><pre>\n`
     stringHTML = stringHTML.concat(line);
     line = removeAndGetline();
     while(lineStartWith[line[0]] !== 'code') {
       Object.keys(htmlEsacpeCharacters)
-      .forEach(key => line = line.replace(key, htmlEsacpeCharacters[key]));
+      .forEach(key => line = line.replaceAll(key, htmlEsacpeCharacters[key]));
       stringHTML = stringHTML.concat(line).concat('\n');
       line = removeAndGetline();
     }
     line = line.slice(count);
-    line = codeType;
-    stringHTML = stringHTML.concat(`</pre></${line}></code>`);
+    // line = codeType;
+    stringHTML = stringHTML.concat(`</pre></${codeType}></code>\n`);
     return true;
   }
   return false;
@@ -390,6 +429,15 @@ function matchRegex(string, regexJson) {
 
 function clearOutPut() {
   stringHTML = '';
+  headingIndexCounts = {
+    h1 : 0,
+    h2 : 0,
+    h3 : 0,
+    h4 : 0,
+    h5 : 0,
+    h6 : 0,
+  }
+  indexHeadings = [];
 }
 
 fromTextButton.onclick= ()=> {
