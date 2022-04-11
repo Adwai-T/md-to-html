@@ -70,11 +70,16 @@ samp{
   color: var(--color2);
   border-radius: 4px;
 }
-code pre{
+pre{
   padding: 5px 10px;
   background-color: var(--color4);
-  color: var(--color2);
   border-radius: 10px;
+  width: min-content;
+}
+code{
+  overflow-wrap: break-word;
+  background-color: var(--color4);
+  color: var(--color2);
 }
 
 /* tables */

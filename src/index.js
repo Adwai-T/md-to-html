@@ -36,6 +36,7 @@ let headingIndexCounts = {
   h6 : 0,
 }
 
+
 //Containes {id, title}
 let indexHeadings = [];
 
@@ -70,7 +71,10 @@ async function load(url, text) {
   stringHTML = createIndex().concat(stringHTML);
 
   //--- Add style file
-  stringHTML = '<link rel="stylesheet" href="display-page.css" />\n<!--Style Applied-->\n'.concat(stringHTML);
+  stringHTML = '\n<link rel="stylesheet" href="display-page.css" />\n'.concat(stringHTML);
+  //--- Hightlight js
+  // let addHightlightJsString = '<link rel=\"stylesheet\" href=\"default.min.css\">\n<script src=\"src/highlight.min.js\"></script>\n<script>hljs.highlightAll();</script>';
+  // stringHTML = stringHTML.concat(addHightlightJsString);
 
   return stringHTML;
 }
@@ -374,7 +378,7 @@ function isCodeBlock(line) {
   if(count > 2) {
     line = line.slice(count);
     let codeType = line; //What remains after ``` is code type as ```js
-    line = `\n<code><${codeType}><pre>\n`
+    line = `\n<pre><code class="language-${codeType}">\n`;
     stringHTML = stringHTML.concat(line);
     line = removeAndGetline();
     while(lineStartWith[line[0]] !== 'code') {
@@ -385,7 +389,7 @@ function isCodeBlock(line) {
     }
     line = line.slice(count);
     // line = codeType;
-    stringHTML = stringHTML.concat(`</pre></${codeType}></code>\n`);
+    stringHTML = stringHTML.concat(`</code></pre>\n`);
     return true;
   }
   return false;
@@ -440,7 +444,7 @@ function clearOutPut() {
   indexHeadings = [];
 }
 
-fromTextButton.onclick= ()=> {
+fromTextButton.onclick= ()=> { 
   clearOutPut();
   let text = textInput.value + '\n';
   load(undefined, text).then(result => {
