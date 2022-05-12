@@ -38,6 +38,9 @@ h5{
 }
 li a{
   text-decoration: none;
+  cursor: not-allowed;
+  opacity: 0.5;
+  pointer-events: none;
 }
 .index-li-h2{
   /* list-style-type: square;  */

@@ -64,5 +64,21 @@
   "em" : {
     "regex" : "\\*{1}(?<emContent>.*?)\\*{1}",
     "flags" : ""
+  },
+  "code-block" : {
+    "regex":  "<pre><code class=\"language-[\\s\\S]*?\">(?<code>[\\s\\S]*?)<\\\/code><\\\/pre>",
+    "flags" : "gm"
+  },
+  "code-start" : {
+    "regex": "<pre><code class=\"language-[\\s\\S]*?\">",
+    "flags": "gm"
+  },
+  "code-end" : {
+    "regex" : "<\/code><\/pre>"
+  },
+
+  "content" : {
+    "regex" : "<h1 id=\"h1-0\">[\\s\\S]*<\\/div>",
+    "flags" : "gm"
   }
 }
