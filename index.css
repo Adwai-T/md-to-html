@@ -23,6 +23,29 @@ h2 {
   border-color: black;
   resize: none;
 }
+
+@media (max-width: 810px) {
+  #container{
+    flex-direction: row;
+    height: auto;
+  }
+  #controls {
+    width: 70vw;
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin: auto;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .display-area {
+    width: 90vw;
+    min-height: 400px;
+  }
+  .button{
+    width:max-content;
+  }
+}
+
 /* CSS */
 .button {
   width: 10vw;
@@ -36,7 +59,6 @@ h2 {
     sans-serif;
   font-size: 14px;
   font-weight: 500;
-  height: 40px;
   line-height: 20px;
   list-style: none;
   margin: 0;
@@ -67,4 +89,15 @@ h2 {
 .button-blue:hover,
 .button-blue:focus {
   background-color: #00bfff;
+}
+
+#footer{
+  margin: 20px 5px;
+  border: solid 2px lightgrey;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+#footer-title{
+  font-size: large;
 }

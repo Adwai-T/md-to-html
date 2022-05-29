@@ -3,6 +3,7 @@
   <head>
     <title>MD TO HTML</title>
     <link rel="stylesheet" href="index.css" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <!-- <link rel="stylesheet" href="default.min.css"> -->
   </head>
   <body>
@@ -14,6 +15,7 @@
         <button id="from-link" class="button button-red">From Link</button>
         <button id="show-html" class="button button-blue">Show Html</button>
         <button id="show-page" class="button button-blue">Show page</button>
+        <button id="download-page" class="button button-blue" download="index.html">Download Page</button>
       </div>
       <iframe
         id="result-page"
@@ -25,5 +27,21 @@
     <script src="src/index.js" type="module"></script>
     <!-- <script src="src/highlight.min.js"></script>
     <script>hljs.highlightAll();</script> -->
+
+    <div id="footer">
+      <div id="footer-title">Features And Additional Information</div>
+      <p>To convert a md file using github link, <strong>click on Raw</strong> on github and then copy the link of the raw md file.</p>
+      <p>A direct link to the rendered md file page will not work, it need the raw file.</p>
+      <p>The whole content of the md file is put inside the <strong>container</strong> div.</p>
+      <p><strong>Index</strong> is automatically created with links to the headings.</p>
+      <p>The index elements is a list element with class specified according to the heading type.</p>
+      <p>The class name for heading can be used to style the index.</p>
+      <p>Tables, links, images, code, sample code are all converted to html element.</p>
+      <p>Code blocks can be style/highlighted with any highliter such as <strong><a target="_blank" href="https://highlightjs.org/">'highlightjs.</a></strong></p>
+      <p>Example of <strong>formatting css</strong> that can be seen on this page <a href="/display-page.css" download="display-page.css">download.</a></p>
+      <p>All the Notes on this website were first created as md and then converted to html with this tool.</p>
+      <p>Direct Link to download <strong><a href="https://adwait.in/assets/libraries/format.js" download="format.js">format.js</a>.</strong></p>
+      <p><strong>View Code and Contribute on <a href="https://github.com/Adwai-T/md-to-html">github.</a></strong></p>
+    </div>
   </body>
 </html>
