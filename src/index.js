@@ -273,7 +273,7 @@ function processAllInLineElements(string) {
     //So we want prevent the first charcter of match from being sliced, hence `+1`
     string =
       string.slice(0, match.index + 1) +
-      `<a href="${match.groups.linkSrc}">${match.groups.linkName}</a>` +
+      `<a href="${match.groups.linkSrc}" target="_blank">${match.groups.linkName}</a>` +
       string.slice(match.index + match[0].length);
     match = matchRegex(string, regexJSON["link"]);
   }
@@ -421,8 +421,7 @@ const htmlEsacpeCharacters = {
   "<": "&lt;",
   ">": "&gt;",
   "*": "&lowast;",
-  "`": "&lsquo;",
-  "!": "	%21",
+  "`": "&lsquo;",  
 };
 function isCodeBlock(line) {
   let count = 0;
